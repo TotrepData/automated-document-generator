@@ -1,3 +1,8 @@
+import subprocess
+import sys
+
+subprocess.check_call([sys.executable, "-m", "pip", "install", "python-docx", "-q"])
+
 import streamlit as st
 import pandas as pd
 from docx import Document
@@ -10,7 +15,6 @@ st.set_page_config(page_title="Generador de Documentos", layout="wide")
 st.title("📄 Generador de Documentos Word")
 st.markdown("Carga tu Excel y tu plantilla, y genera documentos automáticamente")
 
-# Cargar archivos
 col1, col2 = st.columns(2)
 
 with col1:
