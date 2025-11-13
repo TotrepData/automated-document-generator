@@ -1,4 +1,4 @@
-import streamlit as st
+ipoimport streamlit as st
 import pandas as pd
 from docx import Document
 from docx.oxml.ns import qn
