@@ -103,4 +103,4 @@ Para desplegar en Streamlit Cloud:
 
 ## Licencia
 
-Atenea - Dirección de Educación, Ciencia y Tecnología
+Javier Mondragón
