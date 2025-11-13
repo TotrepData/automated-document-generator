@@ -1,30 +1,27 @@
-ipoimport streamlit as st
+import streamlit as st
 import pandas as pd
 from docx import Document
-from docx.oxml.ns import qn
-from docx.oxml import OxmlElement
 import zipfile
 import io
 from datetime import datetime
-import logging
 
-# Configuración
 st.set_page_config(page_title="Generador de Documentos", layout="wide")
-st.title("Equipo de transformación digital - Atenea")
+st.title("Generador de Documentos Word")
 st.markdown("Carga tu Excel y tu plantilla, y genera documentos automáticamente")
 
-# Función para reemplazar placeholder en runs (mejora compatibilidad)
 def replace_text_in_paragraph(paragraph, key, value):
     """Reemplaza placeholders en párrafos manteniendo formato"""
     placeholder = "{{" + key + "}}"
+    value_str = str(value) if value is not None else ""
     
-    if placeholder in paragraph.text:
-        # Limpia runs y reconstruye
+    full_text = "".join(run.text for run in paragraph.runs)
+    
+    if placeholder in full_text:
         for run in paragraph.runs:
             if placeholder in run.text:
-                run.text = run.text.replace(placeholder, str(value))
+                run.text = run.text.replace(placeholder, value_str)
+                return
 
-# Función principal de generación
 def generar_documentos(df, word_file):
     """Genera documentos Word a partir de Excel"""
     try:
@@ -35,16 +32,13 @@ def generar_documentos(df, word_file):
         with zipfile.ZipFile(zip_buffer, "w") as zipf:
             for idx, row in df.iterrows():
                 try:
-                    # Reinicia desde el archivo original
                     word_file.seek(0)
                     doc = Document(word_file)
                     
-                    # Reemplaza en párrafos
                     for paragraph in doc.paragraphs:
                         for key in row.index:
                             replace_text_in_paragraph(paragraph, key, row[key])
                     
-                    # Reemplaza en tablas
                     for table in doc.tables:
                         for row_table in table.rows:
                             for cell in row_table.cells:
@@ -52,7 +46,6 @@ def generar_documentos(df, word_file):
                                     for key in row.index:
                                         replace_text_in_paragraph(paragraph, key, row[key])
                     
-                    # Guarda documento
                     doc_bytes = io.BytesIO()
                     doc.save(doc_bytes)
                     zipf.writestr(f"Documento_{idx + 1}.docx", doc_bytes.getvalue())
@@ -66,7 +59,6 @@ def generar_documentos(df, word_file):
     except Exception as e:
         raise Exception(f"Error procesando documentos: {str(e)}")
 
-# Interface
 col1, col2 = st.columns(2)
 
 with col1:
@@ -77,7 +69,6 @@ with col2:
 if excel_file and word_file:
     st.success("Archivos cargados correctamente")
     
-    # Preview del Excel
     with st.expander("Ver datos del Excel"):
         try:
             df_preview = pd.read_excel(excel_file)
@@ -88,7 +79,6 @@ if excel_file and word_file:
     
     if st.button("Generar Documentos", use_container_width=True, type="primary"):
         try:
-            # Validaciones
             excel_file.seek(0)
             df = pd.read_excel(excel_file)
             
@@ -100,7 +90,6 @@ if excel_file and word_file:
             with st.spinner(f"Procesando {len(df)} documentos..."):
                 zip_buffer, generados, errores = generar_documentos(df, word_file)
                 
-                # Resultados
                 if generados > 0:
                     st.success(f"Se generaron {generados} documentos correctamente")
                     
