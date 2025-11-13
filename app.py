@@ -6,7 +6,7 @@ import io
 from datetime import datetime
 
 st.set_page_config(page_title="Generador de Documentos", layout="wide")
-st.title("Generador de documentos")
+st.title("Generador de documentos - Atenea")
 st.markdown("Carga tu Excel y tu plantilla, y genera documentos automáticamente")
 
 def replace_text_in_paragraph(paragraph, key, value):
