@@ -103,4 +103,4 @@ Para desplegar en Streamlit Cloud:
 
 ## Licencia
 
-Javier Mondragón
+MIT
